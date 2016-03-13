@@ -1,2 +1,6 @@
+# build files
+bin/
+pkg/
+
 # gb vendor
 vendor/src
