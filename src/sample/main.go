@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"jwtauth"
+	"github.com/itzamna314/gin-jwt" as jwtauth
 	"time"
 )
 
