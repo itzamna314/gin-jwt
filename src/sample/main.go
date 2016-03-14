@@ -46,10 +46,6 @@ func makeToken(c *gin.Context) {
 		fmt.Printf("Error: %s\n", err)
 	}
 
-	fmt.Printf("Token: %#v\n", token)
-	fmt.Printf("key: %s\n", superSecretKey)
-	fmt.Printf("Token string: %s\n", tokenString)
-
 	c.JSON(200, gin.H{
 		"token": tokenString,
 	})
