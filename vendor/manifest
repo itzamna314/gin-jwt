@@ -27,6 +27,12 @@
 			"path": "/proto"
 		},
 		{
+			"importpath": "github.com/itzamna314/gin-jwt",
+			"repository": "https://github.com/itzamna314/gin-jwt",
+			"revision": "f4d121dc3a3bf2c154158a106104da76b85b5c8d",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/manucorporat/sse",
 			"repository": "https://github.com/manucorporat/sse",
 			"revision": "ee05b128a739a0fb76c7ebd3ae4810c1de808d6d",
