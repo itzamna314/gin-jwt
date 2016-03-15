@@ -8,17 +8,26 @@ import (
 	"time"
 )
 
-const superSecretKey = "CAFEBEEF"
+const (
+	superSecretKey = "CAFEBEEF"
+	realm          = "http://jwt.io"
+)
 
 type claimsObject struct {
 	auth bool
 }
 
 func main() {
+	validator := jwtauth.Validator{
+		Key:      []byte(superSecretKey),
+		Method:   jwt.SigningMethodHS256,
+		Location: new(string),
+	}
+	*validator.Location = realm
 	r := gin.New()
 
 	r.POST("/tokens", makeToken)
-	r.GET("/private", jwtauth.Validator([]byte(superSecretKey), jwt.SigningMethodHS256), privateHandler)
+	r.GET("/private", validator.Middleware(), privateHandler)
 
 	r.Run()
 }
