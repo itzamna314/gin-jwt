@@ -7,7 +7,7 @@ import (
 )
 
 type Validator struct {
-	Key      []byte
+	Key      interface{}
 	Method   jwt.SigningMethod
 	Location *string
 }
