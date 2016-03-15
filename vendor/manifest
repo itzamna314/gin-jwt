@@ -29,7 +29,7 @@
 		{
 			"importpath": "github.com/itzamna314/gin-jwt",
 			"repository": "https://github.com/itzamna314/gin-jwt",
-			"revision": "023dfc4ada29a38b7ed8e373733d88be5f7a5799",
+			"revision": "e411ec1dfacab969a01e5c7d5181cb545782b8bc",
 			"branch": "master"
 		},
 		{
