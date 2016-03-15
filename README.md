@@ -45,6 +45,9 @@ func privateHandler(c *gin.Context) {
 ## Build
 Use [gb](https://getgb.io/).
 
+## Docs
+https://godoc.org/github.com/itzamna314/gin-jwt
+
 ## Based On:
 * https://github.com/gin-gonic/gin
 * https://github.com/dgrijalva/jwt-go
