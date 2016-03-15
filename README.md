@@ -2,7 +2,7 @@
 JWT Middleware for Gin http framework.  Validates the token, and adds the claims payload into the request context.
 
 # Usage
-```
+```go
 package main
 
 import (
