@@ -14,9 +14,16 @@ import (
 const superSecretKey = "CAFEBEEF"
 
 func main() {
+	validator := jwtauth.Validator{
+		Key:      []byte(superSecretKey),
+		Method:   jwt.SigningMethodHS256,
+		Location: new(string),
+	}
+	*validator.Location = realm
 	r := gin.New()
 
-	r.GET("/private", jwtauth.Validator([]byte(superSecretKey), jwt.SigningMethodHS256), privateHandler)
+	r.POST("/tokens", makeToken)
+	r.GET("/private", validator.Middleware(), privateHandler)
 
 	r.Run()
 }
