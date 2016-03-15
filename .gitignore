@@ -4,3 +4,6 @@ pkg/
 
 # gb vendor
 vendor/src
+
+# vim
+*.swp

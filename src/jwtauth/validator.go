@@ -6,25 +6,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Validator(key []byte, method jwt.SigningMethod) gin.HandlerFunc {
+type Validator struct {
+	Key      []byte
+	Method   jwt.SigningMethod
+	Location *string
+}
+
+func (v *Validator) Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := jwt.ParseFromRequest(c.Request, func(token *jwt.Token) (interface{}, error) {
-			// Don't forget to validate the alg is what you expect:
-			if method.Alg() != token.Method.Alg() {
+			if v.Method.Alg() != token.Method.Alg() {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
-			return key, nil
+			return v.Key, nil
 		})
 
 		if err != nil {
-			c.AbortWithError(401, err)
+			v.unauthorized(c)
 			return
 		}
 
 		if !token.Valid {
-			c.AbortWithError(401, err)
+			v.unauthorized(c)
+			return
 		}
 
 		c.Set("claims", token.Claims)
 	}
+}
+
+func (v *Validator) unauthorized(c *gin.Context) {
+	if v.Location != nil {
+		c.Writer.Header().Set("Location", *v.Location)
+	}
+	c.AbortWithError(401, fmt.Errorf("Request unauthorized"))
 }

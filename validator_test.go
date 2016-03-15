@@ -11,18 +11,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const secretKey = "MyTestSigningKey"
+const (
+	secretKey = "MyTestSigningKey"
+	realm     = "http://foo.bar.com"
+)
 
 func TestValidator(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)
+	validator := Validator{
+		Key:      []byte(secretKey),
+		Method:   jwt.SigningMethodHS256,
+		Location: new(string),
+	}
+	*validator.Location = realm
+
 	router := gin.New()
-	router.GET("/private", Validator([]byte(secretKey), jwt.SigningMethodHS256), privateHandler)
+	router.GET("/private", validator.Middleware(), privateHandler)
 
 	response := makeRequest(router, "GET", "/private", "")
 
 	// No token
 	if response.Code != 401 {
 		t.Errorf("No token.  Expected 401, got %d", response.Code)
+	}
+
+	if realm != response.Header().Get("Location") {
+		t.Errorf("Realm was not set in the location header")
 	}
 
 	// Empty token
