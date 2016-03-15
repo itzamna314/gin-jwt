@@ -39,8 +39,8 @@ func privateHandler(c *gin.Context) {
 }
 ```
 ## Use
-`go get github.com/itzamna314/gin-jwt`
-`gb vendor fetch github.com/itzamna314/gin-jwt`
+* `go get github.com/itzamna314/gin-jwt`
+* `gb vendor fetch github.com/itzamna314/gin-jwt`
 
 ## Build
 Use [gb](https://getgb.io/).
