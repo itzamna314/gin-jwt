@@ -16,21 +16,10 @@ const (
 	realm     = "http://foo.bar.com"
 )
 
-func TestValidator(t *testing.T) {
-	gin.SetMode(gin.ReleaseMode)
-	validator := Validator{
-		Key:      []byte(secretKey),
-		Method:   jwt.SigningMethodHS256,
-		Location: new(string),
-	}
-	*validator.Location = realm
-
-	router := gin.New()
-	router.GET("/private", validator.Middleware(), privateHandler)
-
+func TestNoToken(t *testing.T) {
+	router := createRouter()
 	response := makeRequest(router, "GET", "/private", "")
 
-	// No token
 	if response.Code != 401 {
 		t.Errorf("No token.  Expected 401, got %d", response.Code)
 	}
@@ -38,27 +27,36 @@ func TestValidator(t *testing.T) {
 	if realm != response.Header().Get("Location") {
 		t.Errorf("Realm was not set in the location header")
 	}
+}
 
-	// Empty token
-	response = makeRequest(router, "GET", "/private", "Authorization: Bearer ")
+func TestEmptyToken(t *testing.T) {
+	router := createRouter()
+	response := makeRequest(router, "GET", "/private", "Authorization: Bearer ")
 	if response.Code != 401 {
 		t.Errorf("Empty token: Expected 401, got %d", response.Code)
 	}
 
-	// Token signed with wrong key
-	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["auth"] = true
+}
+
+func TestWrongKey(t *testing.T) {
+	router := createRouter()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"auth": true,
+	})
 	tokenString, _ := token.SignedString([]byte("WrongKey"))
-	response = makeRequest(router, "GET", "/private", fmt.Sprintf("Bearer %s", tokenString))
+	response := makeRequest(router, "GET", "/private", fmt.Sprintf("Bearer %s", tokenString))
 	if response.Code != 401 {
 		t.Errorf("Empty token: Expected 401, got %d", response.Code)
 	}
+}
 
-	// Token signed with right key
-	token = jwt.New(jwt.SigningMethodHS256)
-	token.Claims["auth"] = true
-	tokenString, _ = token.SignedString([]byte("MyTestSigningKey"))
-	response = makeRequest(router, "GET", "/private", fmt.Sprintf("Bearer %s", tokenString))
+func TestValidKey(t *testing.T) {
+	router := createRouter()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"auth": true,
+	})
+	tokenString, _ := token.SignedString([]byte("MyTestSigningKey"))
+	response := makeRequest(router, "GET", "/private", fmt.Sprintf("Bearer %s", tokenString))
 	if response.Code != 200 {
 		t.Errorf("Correct token: Expected 200, got %d", response.Code)
 	}
@@ -87,16 +85,35 @@ func TestValidator(t *testing.T) {
 	}
 }
 
+func createRouter() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	validator := Validator{
+		Key:      []byte(secretKey),
+		Method:   jwt.SigningMethodHS256,
+		Location: new(string),
+	}
+	*validator.Location = realm
+
+	router := gin.New()
+	router.GET("/private", validator.Middleware(), privateHandler)
+	return router
+}
+
 func privateHandler(c *gin.Context) {
 	var claims map[string]interface{}
 	if cl, exists := c.Get("claims"); exists {
 		var ok bool
-		claims, ok = cl.(map[string]interface{})
+		// gin-jwt uses jwt.MapClaims from dgijalva/jwt-go.
+		claims, ok = cl.(jwt.MapClaims)
 		if !ok {
+			fmt.Printf("Error from privateHandler: Failed to parse claims\n")
 			c.AbortWithError(401, fmt.Errorf("missing claims"))
 		}
 	}
 
+	// Write out the plaintext claims in the response for the purposes of this
+	// test.  Note that the jwt.MapClaims will be serialized into a plain
+	// map[string]interface{}.  Also, never do this in a real api.
 	c.JSON(200, gin.H{
 		"claims": claims,
 	})

@@ -3,6 +3,7 @@ package jwtauth
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go/request"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +15,7 @@ type Validator struct {
 
 func (v *Validator) Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := jwt.ParseFromRequest(c.Request, func(token *jwt.Token) (interface{}, error) {
+		token, err := request.ParseFromRequest(c.Request, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
 			if v.Method.Alg() != token.Method.Alg() {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
