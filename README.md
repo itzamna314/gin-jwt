@@ -29,7 +29,7 @@ func main() {
 }
 
 func privateHandler(c *gin.Context) {
-	claims := c.MustGet("claims").(map[string]interface{})
+	claims := c.MustGet("claims").(jwt.MapClaims)
 	
 	// Verify that the claims grant access to this endpoint...
 
