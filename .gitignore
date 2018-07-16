@@ -2,8 +2,8 @@
 bin/
 pkg/
 
-# gb vendor
-vendor/src
+# dep 
+vendor
 
 # vim
 *.swp
